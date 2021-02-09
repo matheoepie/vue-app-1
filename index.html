@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="main">
+        <pre>{{tracks}}</pre>
+    </div>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        const url ='https://api.deezer.com/search?q=';
+
+        const express = require('express');
+        const app = express();
+        const moesif = require('moesif-nodejs');
+
+// 2. Set the options, the only required field is applicationId
+const moesifMiddleware = moesif({
+  applicationId: 'eyJhcHAiOiIxOTg6NzY1IiwidmVyIjoiMi4wIiwib3JnIjoiODg6MTMxMCIsImlhdCI6MTYwOTQ1OTIwMH0.t46jy2HV61WjtrbA_D9ZneYGMFuZxsoXr9mL4c9RYvE',
+
+  // Optional hook to link API calls to users
+  identifyUser: function (req, res) {
+    return req.user ? req.user.id : undefined;
+  },    
+});
+
+// 3. Enable the Moesif middleware to start logging incoming API Calls
+app.use(moesifMiddleware);
+
+        const main = new Vue({
+            el:'#main',
+            data:{
+                search:'Pnl',
+                tracks: []
+            },
+            created: function () {
+				this.fetchData()
+			},
+            methods: {
+                fetchData: async function(){
+                    try {
+                        const rep = await axios.get(url + this.search);
+                        console.log(rep.data);
+                        this.tracks = rep.data;
+                    } catch (error) {
+                        console.log(error);
+                    }
+
+                }
+
+            }
+
+        }
+
+        )
+    </script>
+    
+</body>
+</html>
